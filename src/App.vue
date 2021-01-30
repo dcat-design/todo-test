@@ -2,10 +2,6 @@
   #app
     nav#nav
       router-link(to="/") home
-      |
-      | |
-      |
-      router-link(to="/about") About
     router-view
 
 </template>

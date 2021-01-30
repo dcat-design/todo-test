@@ -4,6 +4,7 @@
     v-for="task in tasks",
     :key="task.id",
     :style="getStyle(task.status)"
+    @dblclick="$emit('edit', task.id)"
   )
     div.TasksList__itemTitle {{ task.title }}
     div.TasksList__itemDescription {{ task.description }}

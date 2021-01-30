@@ -1,8 +1,11 @@
 <template lang="pug">
-  #home
-    TasksList.Home__tasksList(@update="handleUpdate" :tasks="tasks")
-    button.ButtonAdd(@click="handleCreate") Добавить задание
-
+#home
+  TasksList.Home__tasksList(
+    @update="handleUpdate",
+    @edit="handleEdit",
+    :tasks="tasks"
+  )
+  button.ButtonAdd(@click="handleCreate") Добавить задание
 </template>
 
 <script>
@@ -24,10 +27,13 @@ export default {
   },
   methods: {
     handleCreate() {
-      console.log('click');
+      this.$router.push('/tasks/new');
     },
-    handleUpdate: async () => {
+    async handleUpdate() {
       this.tasks = await fetchTasks();
+    },
+    handleEdit(id) {
+      this.$router.push(`/tasks/${id}`);
     },
   },
 };
@@ -47,5 +53,4 @@ export default {
 
 .Home__tasksList
   margin-bottom: 30px
-
 </style>
