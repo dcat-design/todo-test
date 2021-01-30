@@ -21,7 +21,12 @@ export const fetchTaskById = async (id) => {
 };
 
 export const createTask = async (data) => {
-  console.log('create', data);
+  // eslint-disable-next-line camelcase
+  const created_date = new Date()
+    .toISOString()
+    .replace(/(\d{4}(-\d{2}){2})T(\d{2}:\d{2}).*/, '$1 $3');
+  const withDate = { ...data, created_date };
+  console.log('create', withDate);
   const id = Promise.resolve(2);
   return id;
 };
