@@ -36,7 +36,6 @@ export default {
   &__item
     padding: 16px
     background-color: #42b983
-    width: 580px
     color: rgba(0,0,0,.8)
     margin-bottom: 3px
     border-radius: 4px

@@ -1,11 +1,16 @@
 <template lang="pug">
   .EditTask
-    TasksForm(:task="task" @save="handleSave")
+    TasksForm(:task="task" @save="handleSave" @delete="handleDelete")
 </template>
 
 <script>
 import TasksForm from '@/components/TasksForm.vue';
-import { fetchTaskById, createTask, saveTask } from '@/api/api';
+import {
+  fetchTaskById,
+  createTask,
+  saveTask,
+  deleteTask,
+} from '@/api/api';
 
 export default {
   name: 'EditTask',
@@ -47,6 +52,10 @@ export default {
     },
     async updateTask(id) {
       this.task = await fetchTaskById(id);
+    },
+    async handleDelete(id) {
+      await deleteTask(id);
+      this.$router.push('/');
     },
   },
 };

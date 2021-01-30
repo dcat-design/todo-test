@@ -21,13 +21,18 @@ export const fetchTaskById = async (id) => {
 };
 
 export const createTask = async (data) => {
-  console.log(data);
+  console.log('create', data);
   const id = Promise.resolve(2);
   return id;
 };
 
 export const saveTask = async (data) => {
-  console.log(data);
+  console.log('save', data);
   // const id = Promise.resolve(data.id);
+  return null;
+};
+
+export const deleteTask = async (id) => {
+  console.log('delete', id);
   return null;
 };
