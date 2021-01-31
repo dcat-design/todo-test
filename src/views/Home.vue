@@ -1,5 +1,6 @@
 <template lang="pug">
 #home
+  ErrorMessage(v-if="errorMessage" :message="errorMessage")
   TasksList.Home__tasksList(
     @update="handleUpdate",
     @edit="handleEdit",
@@ -10,27 +11,43 @@
 
 <script>
 import TasksList from '@/components/TasksList.vue';
+import ErrorMessage from '@/components/ErrorMessage.vue';
 import { fetchTasks } from '@/api/api';
+import SERVER_STATUSES from '@/lib/serverStatuses';
 
 export default {
   name: 'Home',
   data() {
     return {
       tasks: [],
+      errorMessage: null,
     };
   },
   components: {
     TasksList,
+    ErrorMessage,
   },
   async mounted() {
-    this.tasks = await fetchTasks();
+    this.handleUpdate();
   },
   methods: {
     handleCreate() {
       this.$router.push('/tasks/new');
     },
     async handleUpdate() {
-      this.tasks = await fetchTasks();
+      this.errorMessage = null;
+      const response = await fetchTasks();
+      const {
+        result,
+        status,
+        message,
+      } = response;
+
+      if (status === SERVER_STATUSES.OK) {
+        this.tasks = result;
+      } else {
+        this.errorMessage = message;
+      }
     },
     handleEdit(id) {
       this.$router.push(`/tasks/${id}`);

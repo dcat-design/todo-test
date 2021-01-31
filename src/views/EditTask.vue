@@ -1,10 +1,19 @@
 <template lang="pug">
-  .EditTask
-    TasksForm(:task="task" @save="handleSave" @delete="handleDelete")
+.EditTask
+  ErrorMessage(v-if="errorMessage", :message="errorMessage")
+  TasksForm(
+    v-if="isFound",
+    :task="task",
+    @save="handleSave",
+    @delete="handleDelete"
+  )
 </template>
 
 <script>
 import TasksForm from '@/components/TasksForm.vue';
+import ErrorMessage from '@/components/ErrorMessage.vue';
+import SERVER_STATUSES from '@/lib/serverStatuses';
+
 import {
   fetchTaskById,
   createTask,
@@ -16,9 +25,11 @@ export default {
   name: 'EditTask',
   components: {
     TasksForm,
+    ErrorMessage,
   },
   data: () => ({
-    isCreate: false,
+    isFound: false,
+    errorMessage: null,
     task: {
       id: 0,
       title: '',
@@ -36,26 +47,57 @@ export default {
     const { id } = this.$route.params;
     if (id !== 'new') {
       await this.updateTask(id);
+    } else {
+      this.isFound = true;
     }
   },
   methods: {
     async handleSave() {
-      let result = '';
+      this.errorMessage = null;
+      let response = '';
       if (this.task.id === 0) {
-        result = await createTask(this.task);
+        response = await createTask(this.task);
       } else {
-        result = await saveTask(this.task);
+        response = await saveTask(this.task);
       }
-      if (result) {
+      const { result, status, message } = response;
+
+      if (status === SERVER_STATUSES.OK && this.task.id === 0) {
         this.$router.push(`/tasks/${result}`);
+      }
+      if (status !== SERVER_STATUSES.OK) {
+        this.errorMessage = message;
       }
     },
     async updateTask(id) {
-      this.task = await fetchTaskById(id);
+      this.errorMessage = null;
+      this.isFound = false;
+      const response = await fetchTaskById(id);
+      const {
+        result,
+        status,
+        message,
+        code,
+      } = response;
+      if (status === SERVER_STATUSES.OK) {
+        this.task = result;
+        this.isFound = true;
+      } else {
+        this.errorMessage = message;
+        if (code === 404) {
+          this.isFound = false;
+        }
+      }
     },
     async handleDelete(id) {
-      await deleteTask(id);
-      this.$router.push('/');
+      this.errorMessage = null;
+      const { status, message } = await deleteTask(id);
+
+      if (status === SERVER_STATUSES.OK) {
+        this.$router.push('/');
+      } else {
+        this.errorMessage = message;
+      }
     },
   },
 };

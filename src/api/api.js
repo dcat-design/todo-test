@@ -1,22 +1,40 @@
+import CONFIG from '../../config';
+
 export const fetchTasks = async () => {
   try {
-    const response = await fetch('http://localhost:3000/tasks');
-    const tasksList = response.json();
-    return tasksList;
+    const response = await fetch(`${CONFIG.serverUrl}/tasks`);
+
+    if (response.status >= 400) {
+      return {
+        status: 'error',
+        message: `Ошибка: ${response.statusText} (${response.status})`,
+        code: response.status,
+      };
+    }
+
+    const result = await response.json();
+    return { status: 'ok', result };
   } catch (error) {
-    console.log(error);
-    return false;
+    return { status: 'error', message: error.message };
   }
 };
 
 export const fetchTaskById = async (id) => {
   try {
-    const response = await fetch(`http://localhost:3000/tasks/${id}`);
-    const task = response.json();
-    return task;
+    const response = await fetch(`${CONFIG.serverUrl}/tasks/${id}`);
+
+    if (response.status >= 400) {
+      return {
+        status: 'error',
+        message: `Ошибка: ${response.statusText} (${response.status})`,
+        code: response.status,
+      };
+    }
+
+    const result = await response.json();
+    return { status: 'ok', result };
   } catch (error) {
-    console.error(error);
-    return false;
+    return { status: 'error', message: error.message };
   }
 };
 
@@ -26,18 +44,61 @@ export const createTask = async (data) => {
     .toISOString()
     .replace(/(\d{4}(-\d{2}){2})T(\d{2}:\d{2}).*/, '$1 $3');
   const withDate = { ...data, created_date };
-  console.log('create', withDate);
-  const id = Promise.resolve(2);
-  return id;
+  try {
+    const response = await fetch(`${CONFIG.serverUrl}/tasks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(withDate),
+    });
+
+    if (response.status >= 400) {
+      return { status: 'error', message: `Ошибка: ${response.statusText} (${response.status})` };
+    }
+
+    const { id: result } = await response.json();
+    return { status: 'ok', result };
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
 };
 
 export const saveTask = async (data) => {
-  console.log('save', data);
-  // const id = Promise.resolve(data.id);
-  return null;
+  try {
+    const response = await fetch(`${CONFIG.serverUrl}/tasks/${data.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status >= 400) {
+      return { status: 'error', message: `Ошибка: ${response.statusText} (${response.status})` };
+    }
+
+    return { status: 'ok' };
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
 };
 
 export const deleteTask = async (id) => {
-  console.log('delete', id);
-  return null;
+  try {
+    const response = await fetch(`${CONFIG.serverUrl}/tasks/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status >= 400) {
+      return { status: 'error', message: `Ошибка: ${response.statusText} (${response.status})` };
+    }
+
+    return { status: 'ok' };
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
 };
